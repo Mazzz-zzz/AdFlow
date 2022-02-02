@@ -51,7 +51,7 @@ artifacts
 
 # misc
 .DS_Store
-.env*
+# FUCK IT .env*
 
 # debug
 npm-debug.log*
