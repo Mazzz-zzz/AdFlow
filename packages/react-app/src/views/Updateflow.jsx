@@ -1,20 +1,20 @@
-require("dotenv");
+//require("dotenv");
 const Web3 = require("web3");
 
 //all addresses hardcoded for mumbai
-const hostJSON = require("../artifacts/@superfluid-finance/ethereum-contracts/contracts/interfaces/superfluid/ISuperfluid.sol/ISuperfluid.json")
+const hostJSON = require("../contracts/superfluid/ISuperfluid.sol/ISuperfluid.json")
 const hostABI = hostJSON.abi;
 const hostAddress = "0xEB796bdb90fFA0f28255275e16936D25d3418603";
 
-const cfaJSON = require("../artifacts/@superfluid-finance/ethereum-contracts/contracts/interfaces/agreements/IConstantFlowAgreementV1.sol/IConstantFlowAgreementV1.json")
+const cfaJSON = require("../contracts/IConstantFlowAgreementV1.json")
 const cfaABI = cfaJSON.abi;
 const cfaAddress = "0x49e565Ed1bdc17F3d220f72DF0857C26FA83F873";
 
-const tradeableCashflowJSON = require("../artifacts/contracts/TradeableCashflow.sol/TradeableCashflow.json");
+const tradeableCashflowJSON = require("../contracts/TradeableCashflow.json");
 const tradeableCashflowABI = tradeableCashflowJSON.abi; 
 
   //temporarily hardcode contract address and sender address
-const deployedTradeableCashflow = require("../deployments/polytest/TradeableCashflow.json");
+const deployedTradeableCashflow = require("../contracts/polytest/TradeableCashflow.json");
 const tradeableCashflowAddress = deployedTradeableCashflow.address;
 
 //your address here
@@ -22,7 +22,7 @@ const _sender = "0x4B39D511e3Cb3F9e39A4e62fFcd959BaCffaDd3c";
 
 
 //update a flow
-async function main() {
+export default async function updateit() {
 
   const web3 = new Web3(new Web3.providers.HttpProvider(process.env.MUMBAI_ALCHEMY_URL));
 
@@ -41,7 +41,7 @@ async function main() {
   //create flow by calling host directly in this function
   //create flow from sender to tradeable cashflow address
   //pass in userData to the flow as a parameter
-   async function updateFlow() {
+  async function updateFlow() {
       let cfaTx = (await cfa.methods
      .updateFlow(
       fDAIx,
@@ -81,11 +81,3 @@ async function main() {
 
   }
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
-main()
-  .then(() => process.exit(0))
-  .catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });

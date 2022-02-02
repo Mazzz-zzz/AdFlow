@@ -4,6 +4,87 @@ import { Button, Card, DatePicker, Divider, Input, List, Progress, Slider, Spin,
 import React, { useState } from "react";
 import { Address, Balance } from "../components";
 
+//FUCK IT 
+const Web3 = require("web3");
+
+//all addresses hardcoded for mumbai
+const hostJSON = require("../contracts/superfluid/ISuperfluid.sol/ISuperfluid.json")
+const hostABI = hostJSON.abi;
+const hostAddress = "0xEB796bdb90fFA0f28255275e16936D25d3418603";
+
+const cfaJSON = require("../contracts/IConstantFlowAgreementV1.json")
+const cfaABI = cfaJSON.abi;
+const cfaAddress = "0x49e565Ed1bdc17F3d220f72DF0857C26FA83F873";
+
+const tradeableCashflowJSON = require("../contracts/TradeableCashflow.json");
+const tradeableCashflowABI = tradeableCashflowJSON.abi; 
+
+  //temporarily hardcode contract address and sender address
+const deployedTradeableCashflow = require("../contracts/polytest/TradeableCashflow.json");
+const tradeableCashflowAddress = deployedTradeableCashflow.address;
+
+//your address here
+const _sender = "0x4B39D511e3Cb3F9e39A4e62fFcd959BaCffaDd3c";
+
+async function updateit(updatepurpose) {
+
+  const web3 = new Web3(new Web3.providers.HttpProvider("https://polygon-mumbai.g.alchemy.com/v2/TZASuTmH87wkkDK4RduL1vM0p5BdMT-2"));
+
+
+  //create contract instances for each of these
+  const host = new web3.eth.Contract(hostABI, hostAddress);
+  const cfa = new web3.eth.Contract(cfaABI, cfaAddress);
+  const tradeableCashflow = new web3.eth.Contract(tradeableCashflowABI, tradeableCashflowAddress);
+
+  const fDAIx = "0x5D8B4C2554aeB7e86F387B4d6c00Ac33499Ed01f"
+  const userData = web3.eth.abi.encodeParameter('string', updatepurpose);
+
+
+  const nonce = await web3.eth.getTransactionCount(_sender, 'latest'); // nonce starts counting from 0
+
+  //create flow by calling host directly in this function
+  //create flow from sender to tradeable cashflow address
+  //pass in userData to the flow as a parameter
+  async function updateFlow() {
+      let cfaTx = (await cfa.methods
+     .updateFlow(
+      fDAIx,
+      // _sender,
+      tradeableCashflowAddress,
+      "6858024691358",
+      "0x"
+     )
+     .encodeABI())
+
+     let txData = (await host.methods.callAgreement(
+      cfaAddress, 
+      cfaTx, 
+      userData
+    ).encodeABI());
+
+    let tx = {
+      'to': hostAddress,
+      'gas': 3000000,
+      'nonce': nonce,
+      'data': txData
+    }
+    // Bad idea used metamask
+    let signedTx = await web3.eth.accounts.signTransaction(tx, "5549c8835b97088540e2e4dad9d1ddc6735809a0a3d1b9a3076b7228b8237b29");
+
+    await web3.eth.sendSignedTransaction(signedTx.rawTransaction, function(error, hash) {
+      if (!error) {
+        console.log("🎉 The hash of your transaction is: ", hash, "\n Check Alchemy's Mempool to view the status of your transaction!");
+      } else {
+        console.log("❗Something went wrong while submitting your transaction:", error)
+      }
+     });
+
+    }
+
+  await updateFlow();
+
+  }
+
 export default function ExampleUI({
   message,
   purpose,
@@ -16,14 +97,22 @@ export default function ExampleUI({
   tx,
   readContracts,
   writeContracts,
+  
 }) {
   const [newPurpose, setNewPurpose] = useState("loading...");
+  
 
   return (
     <div>
       {/*
         ⚙️ Here is an example UI that displays and sets the purpose in your smart contract:
       */}
+      <div style={{ border: "1px solid #cccccc", padding: 16, width: 400, margin: "auto", marginTop: 64 }}>
+        <h1>Mint NEW token</h1>
+        <Button onClick={async () => {updateit()}}>
+          Mint new
+        </Button>
+      </div>
       <div style={{ border: "1px solid #cccccc", padding: 16, width: 400, margin: "auto", marginTop: 64 }}>
         <h1>NFT Billboard:</h1>
         <h2>Message: <b>{message}</b></h2>
@@ -37,9 +126,12 @@ export default function ExampleUI({
           <Button
             style={{ marginTop: 8 }}
             onClick={async () => {
+              updateit(newPurpose);
               /* look how you call setPurpose on your contract: */
               /* notice how you pass a call back for tx updates too */
-              const result = tx(writeContracts.YourContract.setPurpose(newPurpose), update => {
+              /*
+              console.log(await writeContracts.TradeableCashflow)
+              const result = tx(writeContracts.TradeableCashflow.setPurpose(newPurpose), update => {
                 console.log("📡 Transaction Update:", update);
                 if (update && (update.status === "confirmed" || update.status === 1)) {
                   console.log(" 🍾 Transaction " + update.hash + " finished!");
@@ -55,10 +147,10 @@ export default function ExampleUI({
                 }
               });
               console.log("awaiting metamask/web3 confirm result...", result);
-              console.log(await result);
+              console.log(await result);*/
             }}
           >
-            Set Purpose!
+            Set New NFT message!!
           </Button>
         </div>
         <Divider />
@@ -85,7 +177,7 @@ export default function ExampleUI({
         <Divider />
         Your Contract Address:
         <Address
-          address={readContracts && readContracts.YourContract ? readContracts.YourContract.address : null}
+          address={readContracts && readContracts.TradeableCashflow ? readContracts.TradeableCashflow.address : null}
           ensProvider={mainnetProvider}
           fontSize={16}
         />
@@ -94,7 +186,7 @@ export default function ExampleUI({
           <Button
             onClick={() => {
               /* look how you call setPurpose on your contract: */
-              tx(writeContracts.YourContract.setPurpose("🍻 Cheers"));
+              tx(writeContracts.TradeableCashflow.setPurpose("🍻 Cheers"));
             }}
           >
             Set Purpose to &quot;🍻 Cheers&quot;
@@ -108,7 +200,7 @@ export default function ExampleUI({
               here we are sending value straight to the contract's address:
             */
               tx({
-                to: writeContracts.YourContract.address,
+                to: writeContracts.TradeableCashflow.address,
                 value: utils.parseEther("0.001"),
               });
               /* this should throw an error about "no fallback nor receive function" until you add it */
@@ -122,7 +214,7 @@ export default function ExampleUI({
             onClick={() => {
               /* look how we call setPurpose AND send some value along */
               tx(
-                writeContracts.YourContract.setPurpose("💵 Paying for this one!", {
+                writeContracts.TradeableCashflow.setPurpose("💵 Paying for this one!", {
                   value: utils.parseEther("0.001"),
                 }),
               );
@@ -137,9 +229,9 @@ export default function ExampleUI({
             onClick={() => {
               /* you can also just craft a transaction and send it to the tx() transactor */
               tx({
-                to: writeContracts.YourContract.address,
+                to: writeContracts.TradeableCashflow.address,
                 value: utils.parseEther("0.001"),
-                data: writeContracts.YourContract.interface.encodeFunctionData("setPurpose(string)", [
+                data: writeContracts.TradeableCashflow.interface.encodeFunctionData("setPurpose(string)", [
                   "🤓 Whoa so 1337!",
                 ]),
               });
@@ -153,7 +245,7 @@ export default function ExampleUI({
 
       {/*
         📑 Maybe display a list of events?
-          (uncomment the event and emit line in YourContract.sol! )
+          (uncomment the event and emit line in TradeableCashflow.sol! )
       */}
       <div style={{ width: 600, margin: "auto", marginTop: 32, paddingBottom: 32 }}>
         <h2>Events:</h2>

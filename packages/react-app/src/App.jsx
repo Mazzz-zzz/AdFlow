@@ -20,13 +20,12 @@ import {
 } from "eth-hooks";
 import { useEventListener } from "eth-hooks/events/useEventListener";
 import { useExchangeEthPrice } from "eth-hooks/dapps/dex";
-// import Hints from "./Hints";
 
 //add NFT billboard here
 import NFTBillboard from "./views/NFTBillboard";
 
 
-// import { ExampleUI, Hints, Subgraph } from "./views";
+import { ExampleUI, Hints } from "./views";
 
 import { useContractConfig } from "./hooks";
 import Portis from "@portis/web3";
@@ -232,6 +231,7 @@ function App() {
 
   // If you want to make 🔐 write transactions to your contracts, use the userSigner:
   const writeContracts = useContractLoader(userSigner, contractConfig, localChainId);
+
 
   // EXTERNAL CONTRACT EXAMPLE:
   //
@@ -458,7 +458,7 @@ function App() {
       <Header />
       {networkDisplay}
       <BrowserRouter>
-        <Menu style={{ textAlign: "center" }} selectedKeys={[route]} mode="horizontal">
+        <Menu style={{ textAlign: "center"}} selectedKeys={[route]} mode="horizontal">
           <Menu.Item key="/">
           </Menu.Item>
           <Menu.Item key="/nftbillboard">
@@ -471,15 +471,7 @@ function App() {
               NFT Billboard
             </Link>
           </Menu.Item>
-            {/* <Link
-              onClick={() => {
-                setRoute("/");
-              }}
-              to="/"
-            > */}
-            {/* Contract */}
-             {/* </Link>
-          </Menu.Item>
+
           <Menu.Item key="/hints">
             <Link
               onClick={() => {
@@ -487,8 +479,9 @@ function App() {
               }}
               to="/hints"
             > 
-               Hints */}
-            {/* </Link> */}
+               Hints
+            </Link>
+            </Menu.Item>
           
           {/* <Menu.Item key="/mainnetdai">
             <Link
@@ -514,21 +507,40 @@ function App() {
 
         <Switch>
           <Route exact path="/">
-          <NFTBillboard
-              address={address}
-              userSigner={userSigner}
-              mainnetProvider={mainnetProvider}
-              localProvider={localProvider}
-              yourLocalBalance={yourLocalBalance}
-              price={price}
-              tx={tx}
-              writeContracts={writeContracts}
-              readContracts={readContracts}
-              billboardOwner={billboardOwner}
-              message={message}
-              purpose={purpose}
-              setPurposeEvents={setPurposeEvents}
-            />
+            <NFTBillboard
+                address={address}
+                userSigner={userSigner}
+                mainnetProvider={mainnetProvider}
+                localProvider={localProvider}
+                yourLocalBalance={yourLocalBalance}
+                price={price}
+                tx={tx}
+                writeContracts={writeContracts}
+                readContracts={readContracts}
+                billboardOwner={billboardOwner}
+                message={message}
+                purpose={purpose}
+                setPurposeEvents={setPurposeEvents}
+              />
+            </Route>
+            <Route exact path="/example">
+              <ExampleUI
+                address={address}
+                userSigner={userSigner}
+                mainnetProvider={mainnetProvider}
+                localProvider={localProvider}
+                yourLocalBalance={yourLocalBalance}
+                price={price}
+                tx={tx}
+                writeContracts={writeContracts}
+                readContracts={readContracts}
+                billboardOwner={billboardOwner}
+                message={message}
+                purpose={purpose}
+                setPurposeEvents={setPurposeEvents}
+
+              />
+            </Route>
             {/*
                 🎛 this scaffolding is full of commonly used components
                 this <Contract/> component will automatically parse your ABI
@@ -543,15 +555,16 @@ function App() {
               blockExplorer={blockExplorer}
               contractConfig={contractConfig}
             /> */}
-          {/* </Route>
-          <Route path="/hints">
+
+          <Route exact path="/hints">
             <Hints
               address={address}
               yourLocalBalance={yourLocalBalance}
               mainnetProvider={mainnetProvider}
               price={price}
             />
-          </Route> */}
+            <h1>YOLO</h1>
+          </Route>
           {/* <Route path="/nftbillboard"> */}
             
           {/* </Route> */}
@@ -584,7 +597,7 @@ function App() {
               writeContracts={writeContracts}
               mainnetProvider={mainnetProvider}
             /> */}
-          </Route>
+          
         </Switch>
       </BrowserRouter>
 

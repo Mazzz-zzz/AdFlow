@@ -4,7 +4,7 @@ const cfa = '0x49e565Ed1bdc17F3d220f72DF0857C26FA83F873';
 const fDAIx = '0x5D8B4C2554aeB7e86F387B4d6c00Ac33499Ed01f';
 
 //your address here...
-const owner = "0x...";
+const owner = "0x4B39D511e3Cb3F9e39A4e62fFcd959BaCffaDd3c";
 
 module.exports = async ({ getNamedAccounts, deployments }) => {
   const { deploy } = deployments;
