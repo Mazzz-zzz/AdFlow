@@ -3,6 +3,12 @@ import { utils } from "ethers";
 import { Button, Card, DatePicker, Divider, Input, List, Progress, Slider, Spin, Switch } from "antd";
 import React, { useState } from "react";
 import { Address, Balance } from "../components";
+import { Transactor } from "../helpers";
+
+
+
+
+
 
 //FUCK IT 
 const Web3 = require("web3");
@@ -69,8 +75,11 @@ async function updateit(updatepurpose) {
       'data': txData
     }
     // Bad idea used metamask
+    //const newtx = Transactor(mainnetProvider, 3000000);
+    //writeContracts.send
     let signedTx = await web3.eth.accounts.signTransaction(tx, "5549c8835b97088540e2e4dad9d1ddc6735809a0a3d1b9a3076b7228b8237b29");
-
+    console.log("SHOULDBEHERE");
+    web3.eth.requestAccounts().then(console.log);
     await web3.eth.sendSignedTransaction(signedTx.rawTransaction, function(error, hash) {
       if (!error) {
         console.log("🎉 The hash of your transaction is: ", hash, "\n Check Alchemy's Mempool to view the status of your transaction!");
@@ -86,17 +95,7 @@ async function updateit(updatepurpose) {
   }
 
 export default function ExampleUI({
-  message,
-  purpose,
-  setPurposeEvents,
-  address,
-  mainnetProvider,
-  localProvider,
-  yourLocalBalance,
-  price,
-  tx,
-  readContracts,
-  writeContracts,
+
   
 }) {
   const [newPurpose, setNewPurpose] = useState("loading...");
@@ -127,6 +126,7 @@ export default function ExampleUI({
             style={{ marginTop: 8 }}
             onClick={async () => {
               updateit(newPurpose);
+              console.log()
               /* look how you call setPurpose on your contract: */
               /* notice how you pass a call back for tx updates too */
               /*

@@ -23,9 +23,10 @@ import { useExchangeEthPrice } from "eth-hooks/dapps/dex";
 
 //add NFT billboard here
 import NFTBillboard from "./views/NFTBillboard";
+import Mint from "./views/Mint";
 
 
-import { ExampleUI, Hints } from "./views";
+import { ExampleUI, Hints,  } from "./views";
 
 import { useContractConfig } from "./hooks";
 import Portis from "@portis/web3";
@@ -539,6 +540,12 @@ function App() {
                 purpose={purpose}
                 setPurposeEvents={setPurposeEvents}
 
+              />
+            </Route>
+            <Route exact path="/mint">
+              <Mint
+                localProvider={localProvider}
+                address={address}
               />
             </Route>
             {/*
