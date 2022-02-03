@@ -6,6 +6,8 @@ import { Address, Balance } from "../components";
 import { Transactor } from "../helpers";
 
 import { ethers } from "ethers";
+import {MoralisProvider, useMoralis} from "react-moralis"
+
 
 
 
@@ -886,7 +888,34 @@ function deploycontract(address, Name, Symbol){
 
 }
 
+function GetNFTS(address) {
+    const { Moralis, initialize, isInitialized} = useMoralis();
+    const [Collection, setNewCollection] = useState([1,2,3]);
 
+    function startit(setNewCollection){
+        initialize();
+        address = "0x1d4E687F79a5E628566c8cB221d3Fb1fe96987D9"
+        const options = { chain: 'mumbai', address: address};
+        const polygonNFTs = Moralis.Web3API.account.getNFTs(options);
+        polygonNFTs.then((res) => {
+          console.log(res.result);
+          setNewCollection(res.result);
+          
+        })
+    }
+
+    return(
+        <div>
+            <Button onClick={() => {startit(setNewCollection)}}>Fetch My Windows</Button>
+            {Collection.map((member, index) => (
+             <div  key={index}>
+                {member.name}
+              </div>
+            ))}
+        </div>
+        
+    )
+}
 
 
 export default function Mint({
@@ -912,8 +941,8 @@ export default function Mint({
         {/*
           ⚙️ Here is an example UI that displays and sets the purpose in your smart contract:
         */}
-        <div style={{ border: "1px solid #cccccc", padding: 16, width: 400, margin: "auto", marginTop: 64 }}>
-          <h1>Mint NEW token</h1>
+        <div style={{ border: "1px solid gold", borderRadius: "10px", padding: 16, width: "50vw", margin: "auto", marginTop: 64 }}>
+          <h1>Mint NEW Window Token</h1>
           <Input padding="2vw"
              placeholder="Board #" onChange={e => {
                 setNewName(e.target.value);
@@ -928,9 +957,15 @@ export default function Mint({
             Mint new
           </Button>
         </div>
+        <Divider />
+        <MoralisProvider initializeOnMount={true} appId="zjMqJRp2HMQBwduP9SbekHJFIOLh85AFj1OsX8zk" serverUrl="https://rbus7gluj43h.usemoralis.com:2053/server">
+            <GetNFTS address={address} />
+        </MoralisProvider>
+
         <div style={{ border: "1px solid #cccccc", padding: 16, width: 400, margin: "auto", marginTop: 64 }}>
           <h1>NFT Billboard:</h1>
           <h2>Message: <b>{message}</b></h2>
+          
           <Divider />
           <div style={{ margin: 8 }}>
             <Input
