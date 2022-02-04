@@ -57,7 +57,7 @@ async function main() {
       cfaTx, 
       userData
     ).encodeABI());
-
+    console.log(txData);
     let tx = {
       'to': hostAddress,
       'gas': 3000000,
