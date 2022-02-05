@@ -1,6 +1,6 @@
 import { SyncOutlined } from "@ant-design/icons";
 import { Signer, utils } from "ethers";
-import { Button, Card, DatePicker, Divider, Input, List, Progress, Slider, Spin, Switch } from "antd";
+import { Button, Card, DatePicker, Divider, Input, List, Image } from "antd";
 import React, { useState } from "react";
 import { Address, Balance } from "../components";
 import { Transactor } from "../helpers";
@@ -11,158 +11,11 @@ import {MoralisProvider, useMoralis} from "react-moralis"
 import TCF from '../contracts/TradeableCashflow.json';
 
 
-const Web3 = require("web3");
-
-async function createflow(TCF_Addr, USER_Addr, URIMessage){
-  const fDAIx = '0x5D8B4C2554aeB7e86F387B4d6c00Ac33499Ed01f';
-
-  const hostJSON = require("../contracts/superfluid/ISuperfluid.sol/ISuperfluid.json")
-  const hostABI = hostJSON.abi;
 
 
-  const hostAddress = '0xEB796bdb90fFA0f28255275e16936D25d3418603'
-
-  const cfaJSON = require("../contracts/IConstantFlowAgreementV1.json")
-  const cfaABI = cfaJSON.abi;
-  const cfaAddress = '0x49e565Ed1bdc17F3d220f72DF0857C26FA83F873';
-
-  const tradeableCashflowJSON = require("../contracts/TradeableCashflow.json");
-  const tradeableCashflowABI = tradeableCashflowJSON.abi; 
-
-  console.log("Hi")
-
-  async function startFlow() {
-
-    let ethereum = window.ethereum;
-    await ethereum.enable();
-    let provider = new ethers.providers.Web3Provider(ethereum);
-    console.log(provider);
-
-    const signer = provider.getSigner();
-    var hostcontract = new ethers.Contract(hostAddress , hostABI , signer )
-    var TCFcontract = new ethers.Contract(TCF_Addr , tradeableCashflowABI , signer )
-
-    const iCFA = new ethers.utils.Interface(cfaABI);
-    var CFA = new ethers.Contract(cfaAddress , cfaABI , signer );
-    var CFA_TX = iCFA.encodeFunctionData("createFlow", [fDAIx, TCF_Addr, "3858024691358", "0x"]);
-    console.log("TX: ", CFA_TX)
-    //const iHOST = new ethers.utils.Interface(hostABI);
-    //var HOST_TX = iHOST.encodeFunctionData("callAgreement", [cfaAddress, CFA_TX, userdata]);
-    const ENCODED_URI = new ethers.utils.AbiCoder().encode(["string"], [URIMessage]);
-    
-    const UNSIGNED = await hostcontract.populateTransaction.callAgreement(cfaAddress, CFA_TX, ENCODED_URI);
-    
-    const params = [{...UNSIGNED}];
-    console.log(params)
-
-    const transactionHash = await provider.send('eth_sendTransaction', params)
-    console.log('transactionHash is ' + transactionHash);
-  }
-
-  await startFlow();
-}
-
-function deploycontract(address, Name, Symbol){
-  const host = '0xEB796bdb90fFA0f28255275e16936D25d3418603';
-  const cfa = '0x49e565Ed1bdc17F3d220f72DF0857C26FA83F873';
-  const fDAIx = '0x5D8B4C2554aeB7e86F387B4d6c00Ac33499Ed01f';
-    
-
-    
-    //get from metamask
-    const owner = address;
-    
-
-    const fs = require('fs');
-    (async () => {
-
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
-      console.log(signer);
-      const metadata = TCF;
-    
-      //const options = {gasLimit: 400000, gasPrice: ethers.utils.parseUnits(price, 'gwei')}
-      
-      // Deploy the contract
-        const symbol = Symbol + "Window";
-        const name = Symbol + " Window #" + Name;
-
-      const factory = new ethers.ContractFactory(metadata.abi, metadata.bytecode, signer)
-    
-
-      const contract =  await factory.deploy(owner, name, symbol, host, cfa, fDAIx )
-
-      console.log(`Deployment successful! Contract Address: ${contract.address}`)
-    })()
-
-}
-
-function GetNFTS(theaddress) {
-  const { Moralis, initialize, isInitialized} = useMoralis();
-  const [Collection, setNewCollection] = useState([1,2,3]);
-  const [Userdata, setUserdata] = useState([1,2,3]);
-  const [NFTMessage, setNFTMessage] = useState("Default message")
-
-  const tradeableCashflowJSON = require("../contracts/TradeableCashflow.json");
-  const tradeableCashflowABI = tradeableCashflowJSON.abi; 
-  const provider = new ethers.providers.Web3Provider(window.ethereum);
-  var datacontract = new ethers.Contract("0x11389d15872b784f3320ed412f2c3294f4302dfd", tradeableCashflowABI, provider);
-
-  function startit(){
-      initialize();
-
-      console.log(theaddress.theaddress)
-      const options = { chain: 'mumbai', address: theaddress.theaddress};
-      const polygonNFTs = Moralis.Web3API.account.getNFTs(options);
-      polygonNFTs.then((res) => {
-        console.log(res.result);
-        setNewCollection(res.result);
-        var newData = []
-        res.result.map(async (member, i) => {
-          console.log("tokenaddr", await member.token_address)
-          var data = datacontract.attach(await member.token_address);
-          newData[i] = await data.userData();
-          setUserdata(newData)
-        })
-      })
-  }
 
 
-  return(
-      <div>
-          <Button onClick={() => {startit()}}>Fetch My Windows</Button>
-          <div style={{display: "flex", flexWrap: "wrap", justifyContent: "space-evenly"}}>
-            {Collection.map((member, index) => (
-              <div  key={index} style={{padding: "10px"}}>
-                <div style={{ border: "1px solid #cccccc", padding: 16, width: "30vw", margin: "auto", marginTop: 64 }}>
-                  <h1>{member.name}:</h1>
-                  <h2>Message: <b>{}</b></h2>
-            
-                  <Divider />
-                  <h3>USERDATA: {Userdata[index]}</h3>
-                  <div style={{ margin: 8 }}>
-                    <Input placeholder="Image URI"
-                    onChange={e => {
-                      setNFTMessage(e.target.value);
-                    }}
-                    />
-                    <Button
-                    style={{ marginTop: 8 }}
-                    onClick={async () => {
-                    }}>
-                    Set New NFT message!!
-                    </Button>
-                    <Button onClick={() => {createflow(member.token_address, theaddress.theaddress, NFTMessage)}}>
-                      Create Flow
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-    )
-}
+
 
 
 export default function Mint({
@@ -179,6 +32,158 @@ export default function Mint({
     writeContracts,
     
   }) {
+    function GetNFTS(theaddress) {
+      const { Moralis, initialize, isInitialized} = useMoralis();
+      const [Collection, setNewCollection] = useState([]);
+      const [Userdata, setUserdata] = useState([]);
+      const [NFTMessage, setNFTMessage] = useState("Default message")
+    
+      const tradeableCashflowJSON = require("../contracts/TradeableCashflow.json");
+      const tradeableCashflowABI = tradeableCashflowJSON.abi; 
+      const provider = localProvider;
+      var datacontract = new ethers.Contract("0x11389d15872b784f3320ed412f2c3294f4302dfd", tradeableCashflowABI, provider);
+    
+      function startit(){
+    
+          console.log(theaddress.theaddress)
+          const options = { chain: 'mumbai', address: theaddress.theaddress};
+          const polygonNFTs = Moralis.Web3API.account.getNFTs(options);
+          polygonNFTs.then((res) => {
+            console.log(res.result);
+            setNewCollection(res.result);
+            var newData = Userdata
+            res.result.map(async (member, i) => {
+    
+              var data = datacontract.attach(member.token_address);
+              const collectionUserData = await data.userData();
+              if (collectionUserData == "") {
+                newData[i] = <p style={{color: "red"}}>Not set</p>;
+                setUserdata(newData)
+              }
+              else if (collectionUserData.slice(0,4) == "http") {
+                newData[i] = <Image src={collectionUserData}></Image>
+                setUserdata(newData)
+              }
+              else {newData[i] = collectionUserData; setUserdata(newData)}
+    
+              
+            })
+          })
+      }
+    
+    
+      return(
+          <div>
+              <Button onClick={() => {startit()}}>Fetch My Windows</Button>
+              <div style={{display: "flex", flexWrap: "wrap", justifyContent: "space-evenly"}}>
+                {Collection.map((member, index) => (
+                  <div  key={index} style={{padding: "10px"}}>
+                    <div style={{ border: "1px solid #cccccc", padding: 16, width: "30vw", margin: "auto", marginTop: 64 }}>
+                      <h1>{member.name}:</h1>
+                      <h2>Message: <b>{}</b></h2>
+                
+                      <Divider />
+                      <h3>USERDATA: {Userdata[index]}</h3>
+                      <div style={{ margin: 8 }}>
+                        <Input placeholder="Image URI"
+                        onChange={e => {
+                          setNFTMessage(e.target.value);
+                        }}
+                        />
+                        <Button
+                        style={{ marginTop: 8 }}
+                        onClick={async () => {
+                        }}>
+                        Set New NFT message!!
+                        </Button>
+                        <Button onClick={() => {createflow(member.token_address, theaddress.theaddress, NFTMessage, localProvider)}}>
+                          Create Flow
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+        )
+    };
+
+    function deploycontract(address, Name, Symbol){
+      const host = '0xEB796bdb90fFA0f28255275e16936D25d3418603';
+      const cfa = '0x49e565Ed1bdc17F3d220f72DF0857C26FA83F873';
+      const fDAIx = '0x5D8B4C2554aeB7e86F387B4d6c00Ac33499Ed01f';
+      const owner = address;
+    
+        (async () => {
+    
+          let ethereum = window.ethereum;
+          await ethereum.enable();
+          let provider = new ethers.providers.Web3Provider(ethereum);
+          
+          const signer = provider.getSigner();
+          console.log(signer);
+          const metadata = TCF;
+          const symbol = Symbol + "Window";
+          const name = Symbol + " Window #" + Name;
+    
+          const factory = new ethers.ContractFactory(metadata.abi, metadata.bytecode, signer)
+          const contract =  await factory.deploy(owner, name, symbol, host, cfa, fDAIx )
+          console.log(`Deployment successful! Contract Address: ${contract.address}`)
+        })()
+    
+    };
+
+    async function createflow(TCF_Addr, USER_Addr, URIMessage ){
+      const fDAIx = '0x5D8B4C2554aeB7e86F387B4d6c00Ac33499Ed01f';
+    
+      const hostJSON = require("../contracts/superfluid/ISuperfluid.sol/ISuperfluid.json")
+      const hostABI = hostJSON.abi;
+    
+    
+      const hostAddress = '0xEB796bdb90fFA0f28255275e16936D25d3418603'
+    
+      const cfaJSON = require("../contracts/IConstantFlowAgreementV1.json")
+      const cfaABI = cfaJSON.abi;
+      const cfaAddress = '0x49e565Ed1bdc17F3d220f72DF0857C26FA83F873';
+    
+      const tradeableCashflowJSON = require("../contracts/TradeableCashflow.json");
+      const tradeableCashflowABI = tradeableCashflowJSON.abi; 
+    
+      console.log("Hi")
+    
+      async function startFlow() {
+    
+    
+        let ethereum = window.ethereum;
+        await ethereum.enable();
+        let provider = new ethers.providers.Web3Provider(ethereum);
+        console.log(provider);
+    
+        const signer = provider.getSigner();
+        var hostcontract = new ethers.Contract(hostAddress , hostABI , signer )
+        var TCFcontract = new ethers.Contract(TCF_Addr , tradeableCashflowABI , signer )
+    
+        const iCFA = new ethers.utils.Interface(cfaABI);
+        var CFA = new ethers.Contract(cfaAddress , cfaABI , signer );
+        var CFA_TX = iCFA.encodeFunctionData("createFlow", [fDAIx, TCF_Addr, "3858024691358", "0x"]);
+        console.log("TX: ", CFA_TX)
+    
+        const ENCODED_URI = new ethers.utils.AbiCoder().encode(["string"], [URIMessage]);
+        
+        const UNSIGNED = await hostcontract.populateTransaction.callAgreement(cfaAddress, CFA_TX, ENCODED_URI);
+        
+        const params = [{...UNSIGNED}];
+        console.log(params)
+    
+        const transactionHash = await provider.send('eth_sendTransaction', params)
+        console.log('transactionHash is ' + transactionHash);
+      }
+    
+      await startFlow();
+    }
+
+
+
     const [Name, setNewName] = useState("ValueNotSet");
     const [Symbol, setNewSymbol] = useState("ValueNotSet");
     
@@ -205,9 +210,7 @@ export default function Mint({
           </Button>
         </div>
         <Divider />
-        <MoralisProvider initializeOnMount={true} appId="zjMqJRp2HMQBwduP9SbekHJFIOLh85AFj1OsX8zk" serverUrl="https://rbus7gluj43h.usemoralis.com:2053/server">
-            <GetNFTS theaddress={address} />
-        </MoralisProvider>
+          <GetNFTS theaddress={address} />
 
 
         </div>

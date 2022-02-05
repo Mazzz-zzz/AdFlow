@@ -1,9 +1,9 @@
-import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 import React from "react";
 import { ThemeSwitcherProvider } from "react-css-theme-switcher";
 import ReactDOM from "react-dom";
 import App from "./App";
 import "./index.css";
+import {MoralisProvider, useMoralis} from "react-moralis"
 
 const themes = {
   dark: `${process.env.PUBLIC_URL}/dark-theme.css`,
@@ -12,18 +12,13 @@ const themes = {
 
 const prevTheme = window.localStorage.getItem("theme");
 
-const subgraphUri = "http://localhost:8000/subgraphs/name/scaffold-eth/your-contract";
-
-const client = new ApolloClient({
-  uri: subgraphUri,
-  cache: new InMemoryCache(),
-});
-
 ReactDOM.render(
-  <ApolloProvider client={client}>
+  
     <ThemeSwitcherProvider themeMap={themes} defaultTheme={prevTheme || "light"}>
-      <App subgraphUri={subgraphUri} />
+      <MoralisProvider initializeOnMount={true} appId="zjMqJRp2HMQBwduP9SbekHJFIOLh85AFj1OsX8zk" serverUrl="https://rbus7gluj43h.usemoralis.com:2053/server">
+        <App />
+      </MoralisProvider>
     </ThemeSwitcherProvider>
-  </ApolloProvider>,
+  ,
   document.getElementById("root"),
 );
