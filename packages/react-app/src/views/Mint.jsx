@@ -12,12 +12,6 @@ import TCF from '../contracts/TradeableCashflow.json';
 
 
 
-
-
-
-
-
-
 export default function Mint({
     message,
     purpose,
@@ -37,6 +31,8 @@ export default function Mint({
       const [Collection, setNewCollection] = useState([]);
       const [Userdata, setUserdata] = useState([]);
       const [NFTMessage, setNFTMessage] = useState("Default message")
+      const [Flowrate, setFlowrate] = useState("3858024691358");
+      console.log(Flowrate);
     
       const tradeableCashflowJSON = require("../contracts/TradeableCashflow.json");
       const tradeableCashflowABI = tradeableCashflowJSON.abi; 
@@ -79,24 +75,21 @@ export default function Mint({
                 {Collection.map((member, index) => (
                   <div  key={index} style={{padding: "10px"}}>
                     <div style={{ border: "1px solid #cccccc", padding: 16, width: "30vw", margin: "auto", marginTop: 64 }}>
-                      <h1>{member.name}:</h1>
-                      <h2>Message: <b>{}</b></h2>
-                
+                      <h1>{member.name}:</h1>               
                       <Divider />
                       <h3>USERDATA: {Userdata[index]}</h3>
                       <div style={{ margin: 8 }}>
+                        <Input placeholder="FlowRate Per Day"
+                        onChange={e => {
+                          setFlowrate(Math.floor(((e.target.value)*10**18)/86400).toString())
+                        }}
+                        />
                         <Input placeholder="Image URI"
                         onChange={e => {
                           setNFTMessage(e.target.value);
                         }}
                         />
-                        <Button
-                        style={{ marginTop: 8 }}
-                        onClick={async () => {
-                        }}>
-                        Set New NFT message!!
-                        </Button>
-                        <Button onClick={() => {createflow(member.token_address, theaddress.theaddress, NFTMessage, localProvider)}}>
+                        <Button onClick={() => {createflow(member.token_address, theaddress.theaddress, NFTMessage, Flowrate)}}>
                           Create Flow
                         </Button>
                       </div>
@@ -119,7 +112,7 @@ export default function Mint({
           let ethereum = window.ethereum;
           await ethereum.enable();
           let provider = new ethers.providers.Web3Provider(ethereum);
-          
+
           const signer = provider.getSigner();
           console.log(signer);
           const metadata = TCF;
@@ -133,7 +126,7 @@ export default function Mint({
     
     };
 
-    async function createflow(TCF_Addr, USER_Addr, URIMessage ){
+    async function createflow(TCF_Addr, USER_Addr, URIMessage, Flowrate ){
       const fDAIx = '0x5D8B4C2554aeB7e86F387B4d6c00Ac33499Ed01f';
     
       const hostJSON = require("../contracts/superfluid/ISuperfluid.sol/ISuperfluid.json")
@@ -149,8 +142,7 @@ export default function Mint({
       const tradeableCashflowJSON = require("../contracts/TradeableCashflow.json");
       const tradeableCashflowABI = tradeableCashflowJSON.abi; 
     
-      console.log("Hi")
-    
+
       async function startFlow() {
     
     
@@ -165,7 +157,7 @@ export default function Mint({
     
         const iCFA = new ethers.utils.Interface(cfaABI);
         var CFA = new ethers.Contract(cfaAddress , cfaABI , signer );
-        var CFA_TX = iCFA.encodeFunctionData("createFlow", [fDAIx, TCF_Addr, "3858024691358", "0x"]);
+        var CFA_TX = iCFA.encodeFunctionData("createFlow", [fDAIx, TCF_Addr, Flowrate, "0x"]);
         console.log("TX: ", CFA_TX)
     
         const ENCODED_URI = new ethers.utils.AbiCoder().encode(["string"], [URIMessage]);
@@ -193,8 +185,8 @@ export default function Mint({
         {/*
           ⚙️ Here is an example UI that displays and sets the purpose in your smart contract:
         */}
-        <div style={{ border: "1px solid gold", borderRadius: "10px", padding: 16, width: "50vw", margin: "auto", marginTop: 64 }}>
-          <h1>Mint NEW Window Token</h1>
+        <div style={{ border: "1px solid black", boxShadow: "5px 5px" , borderRadius: "10px", padding: 16, width: "50vw", margin: "auto", marginTop: 64 }}>
+          <h1>Mint New AdWindow Token</h1>
           <Input padding="2vw"
              placeholder="Board #" onChange={e => {
                 setNewName(e.target.value);
