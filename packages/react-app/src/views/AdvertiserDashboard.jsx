@@ -32,8 +32,7 @@ export default function Mint({
       const { Moralis, initialize, isInitialized} = useMoralis();
       const [Collection, setNewCollection] = useState([]);
       const [Userdata, setUserdata] = useState([]);
-      const [FlowrateData, setFlowrateData] = useState({});
-
+      const [FlowrateData, setFlowrateData] = useState([]);
 
       const [NFTMessage, setNFTMessage] = useState("Default message")
       const [Flowrate, setFlowrate] = useState("3858024691358");
@@ -43,7 +42,7 @@ export default function Mint({
       const tradeableCashflowJSON = require("../contracts/TradeableCashflowNEW.json");
       const tradeableCashflowABI = tradeableCashflowJSON.abi; 
       const provider = localProvider;
-      var datacontract = new ethers.Contract("0xBD0f25368f8323e499Af9B44f351A6e4DDE0db9c", tradeableCashflowABI, provider);
+      var datacontract = new ethers.Contract("0x11389d15872b784f3320ed412f2c3294f4302dfd", tradeableCashflowABI, provider);
     
       function startit(){
     
@@ -68,16 +67,8 @@ export default function Mint({
               }
               else {newData[i] = collectionUserData; setUserdata(newData)}
               
+              
 
-              const collectionReceiver = await data.currentReceiver();
-              const collectionFlowrateData = collectionReceiver.flowRate;
-              const obj = FlowrateData;
-              obj[i] = ((parseInt(collectionFlowrateData._hex, 16 )*86400)/(10**18)).toFixed(2);
-              if (obj[i] == 0) {
-                obj[i] = <p style={{color: "red"}}>No Flowrate, please CreateFlow</p>;
-                setFlowrateData(obj)
-              }
-              else {setFlowrateData(obj)}
               
             })
           })
@@ -93,9 +84,9 @@ export default function Mint({
                     <div style={{ border: "1px solid #cccccc", padding: 16, width: "30vw", margin: "auto", marginTop: 64 }}>
                       <h1>{member.name}:</h1>               
                       <Divider />
-                      <h3>FlowRate (DAIx / Day): {FlowrateData[index]}</h3>
+                      <h3>USERDATA: {Userdata[index]}</h3>
                       <div style={{ margin: 8 }}>
-                        <Input type={"number"} placeholder="FlowRate Per Day"
+                        <Input placeholder="FlowRate Per Day"
                         onChange={e => {
                           setFlowrate(Math.floor(((e.target.value)*10**18)/86400).toString())
                         }}
@@ -123,7 +114,7 @@ export default function Mint({
       const fDAIx = '0x5D8B4C2554aeB7e86F387B4d6c00Ac33499Ed01f';
       const owner = address;
     
-      try{ (async () => {
+        (async () => {
     
           let ethereum = window.ethereum;
           await ethereum.enable();
@@ -139,8 +130,7 @@ export default function Mint({
           const contract =  await factory.deploy(owner, name, symbol, host, cfa, fDAIx, owner )
           //for contract: owner == reciever
           console.log(`Deployment successful! Contract Address: ${contract.address}`)
-          alert("Adwindow Minted! Please point the Adspace on your website to the baseURI image of: " + contract.address)
-        })()} catch (err) { alert("Minting not successful. Err:" + err) }
+        })()
     
     };
 

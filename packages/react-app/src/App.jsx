@@ -21,7 +21,8 @@ import { useEventListener } from "eth-hooks/events/useEventListener";
 
 import NFTBillboard from "./views/NFTBillboard";
 import Mint from "./views/Mint";
-import { ExampleUI, Hints,  } from "./views";
+import Mainpage from "./views/Mainpage"
+//import { ExampleUI, Hints,  } from "./views";
 import { useContractConfig } from "./hooks";
 import {useMoralis} from "react-moralis"
 
@@ -51,6 +52,9 @@ const web3Modal = new Web3Modal({
 
 
 function App() {
+  
+
+
   const mainnetProvider = localProvider;
   const { Moralis, initialize, isInitialized} = useMoralis();
 
@@ -116,15 +120,12 @@ function App() {
   const mainnetContracts = useContractLoader(mainnetProvider, contractConfig);
 
 
-  //two new variables that we'll use
-  const message = useContractReader(readContracts, "TradeableCashflow", "userData")
-  const billboardOwner = useContractReader(readContracts, "TradeableCashflow", "_receiver")
 
-  // keep track of a variable from the contract in the local React state:
-  const purpose = useContractReader(readContracts, "YourContract", "purpose");
+
+
+
 
   // 📟 Listen for broadcast events
-  const setPurposeEvents = useEventListener(readContracts, "YourContract", "SetPurpose", localProvider, 1);
 
 
   //
@@ -314,6 +315,11 @@ function App() {
 
         <Switch>
           <Route exact path="/">
+            <Mainpage
+
+              />
+            </Route>
+          <Route exact path="/billboard">
             <NFTBillboard
                 address={address}
                 userSigner={userSigner}
@@ -323,29 +329,11 @@ function App() {
                 tx={tx}
                 writeContracts={writeContracts}
                 readContracts={readContracts}
-                billboardOwner={billboardOwner}
-                message={message}
-                purpose={purpose}
-                setPurposeEvents={setPurposeEvents}
-              />
-            </Route>
-            <Route exact path="/example">
-              <ExampleUI
-                address={address}
-                userSigner={userSigner}
-                localProvider={localProvider}
-                yourLocalBalance={yourLocalBalance}
-                price={gasPrice}
-                tx={tx}
-                writeContracts={writeContracts}
-                readContracts={readContracts}
-                billboardOwner={billboardOwner}
-                message={message}
-                purpose={purpose}
-                setPurposeEvents={setPurposeEvents}
+
 
               />
             </Route>
+
             <Route exact path="/mint">
               <Mint
                 localProvider={localProvider}
@@ -353,15 +341,7 @@ function App() {
               />
             </Route>
 
-          <Route exact path="/hints">
-            <Hints
-              address={address}
-              yourLocalBalance={yourLocalBalance}
-              mainnetProvider={mainnetProvider}
-              price={gasPrice}
-            />
-            <h1>YOLO</h1>
-          </Route>
+
                    
         </Switch>
       </BrowserRouter>

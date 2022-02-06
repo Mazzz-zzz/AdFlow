@@ -30,7 +30,7 @@ const { utils } = require("ethers");
 */
 
 export default function Balance(props) {
-  const [dollarMode, setDollarMode] = useState(true);
+  const [dollarMode, setDollarMode] = useState(false);
 
   // const [listening, setListening] = useState(false);
 
@@ -70,7 +70,7 @@ export default function Balance(props) {
         cursor: "pointer",
       }}
       onClick={() => {
-        setDollarMode(!dollarMode);
+        
       }}
     >
       {displayBalance}
