@@ -52,6 +52,9 @@ const web3Modal = new Web3Modal({
 
 
 function App() {
+  
+
+
   const mainnetProvider = localProvider;
   const { Moralis, initialize, isInitialized} = useMoralis();
 
@@ -117,15 +120,12 @@ function App() {
   const mainnetContracts = useContractLoader(mainnetProvider, contractConfig);
 
 
-  //two new variables that we'll use
-  const message = useContractReader(readContracts, "TradeableCashflow", "userData")
-  const billboardOwner = useContractReader(readContracts, "TradeableCashflow", "_receiver")
 
-  // keep track of a variable from the contract in the local React state:
-  const purpose = useContractReader(readContracts, "YourContract", "purpose");
+
+
+
 
   // 📟 Listen for broadcast events
-  const setPurposeEvents = useEventListener(readContracts, "YourContract", "SetPurpose", localProvider, 1);
 
 
   //
@@ -329,10 +329,8 @@ function App() {
                 tx={tx}
                 writeContracts={writeContracts}
                 readContracts={readContracts}
-                billboardOwner={billboardOwner}
-                message={message}
-                purpose={purpose}
-                setPurposeEvents={setPurposeEvents}
+
+
               />
             </Route>
 
