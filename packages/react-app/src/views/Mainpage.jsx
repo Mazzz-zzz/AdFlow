@@ -16,6 +16,8 @@ export default function Mainpage({ }) {
         <p>
           Connects webmasters with advertisers via streamable tokens
         </p>
+        <p>⚠️ Current Bugs: Please make sure to use an empty metamask wallet and connect manually on the top right screen</p>
+
         
         <div style={{padding: 20}}>
           <Button style={{margin: 10}}><Link to="/mint">Webmaster Dashboard</Link></Button>
