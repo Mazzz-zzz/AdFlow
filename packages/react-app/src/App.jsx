@@ -21,7 +21,8 @@ import { useEventListener } from "eth-hooks/events/useEventListener";
 
 import NFTBillboard from "./views/NFTBillboard";
 import Mint from "./views/Mint";
-import { ExampleUI, Hints,  } from "./views";
+import Mainpage from "./views/Mainpage"
+//import { ExampleUI, Hints,  } from "./views";
 import { useContractConfig } from "./hooks";
 import {useMoralis} from "react-moralis"
 
@@ -314,6 +315,11 @@ function App() {
 
         <Switch>
           <Route exact path="/">
+            <Mainpage
+
+              />
+            </Route>
+          <Route exact path="/billboard">
             <NFTBillboard
                 address={address}
                 userSigner={userSigner}
@@ -329,23 +335,7 @@ function App() {
                 setPurposeEvents={setPurposeEvents}
               />
             </Route>
-            <Route exact path="/example">
-              <ExampleUI
-                address={address}
-                userSigner={userSigner}
-                localProvider={localProvider}
-                yourLocalBalance={yourLocalBalance}
-                price={gasPrice}
-                tx={tx}
-                writeContracts={writeContracts}
-                readContracts={readContracts}
-                billboardOwner={billboardOwner}
-                message={message}
-                purpose={purpose}
-                setPurposeEvents={setPurposeEvents}
 
-              />
-            </Route>
             <Route exact path="/mint">
               <Mint
                 localProvider={localProvider}
@@ -353,15 +343,7 @@ function App() {
               />
             </Route>
 
-          <Route exact path="/hints">
-            <Hints
-              address={address}
-              yourLocalBalance={yourLocalBalance}
-              mainnetProvider={mainnetProvider}
-              price={gasPrice}
-            />
-            <h1>YOLO</h1>
-          </Route>
+
                    
         </Switch>
       </BrowserRouter>

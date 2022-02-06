@@ -5,6 +5,8 @@ import App from "./App";
 import "./index.css";
 import {MoralisProvider, useMoralis} from "react-moralis"
 
+
+
 const themes = {
   dark: `${process.env.PUBLIC_URL}/dark-theme.css`,
   light: `${process.env.PUBLIC_URL}/light-theme.css`,
